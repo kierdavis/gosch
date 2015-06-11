@@ -203,9 +203,18 @@ type File struct {
 }
 
 type Object interface {
-	// Provided by BaseObject
+	// Return a list of all attributes on the object.
 	Attrs() []Attribute
+	
+	// Get the attribute with the given name.
 	GetAttr(string) Attribute
+	
+	// Add an attribute with the given name and value, overwriting an existing
+	// attribute with the same name if present.
+	SetAttr(Attribute)
+	
+	// Add an attribute with the given name and value, creating a new attribute
+	// even if one with the same name already exists.
 	AddAttr(Attribute)
 
 	Encode(Encoder) error
@@ -229,7 +238,7 @@ func (o *BaseObject) GetAttr(name string) (attr Attribute) {
 	return Attribute{}
 }
 
-func (o *BaseObject) AddAttr(attr Attribute) {
+func (o *BaseObject) SetAttr(attr Attribute) {
 	for _, a := range o.Attributes {
 		if a.Name == attr.Name {
 			a.Value = attr.Value
@@ -238,6 +247,10 @@ func (o *BaseObject) AddAttr(attr Attribute) {
 		}
 	}
 
+	o.Attributes = append(o.Attributes, attr)
+}
+
+func (o *BaseObject) AddAttr(attr Attribute) {
 	o.Attributes = append(o.Attributes, attr)
 }
 
